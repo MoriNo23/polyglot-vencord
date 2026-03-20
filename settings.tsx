@@ -39,6 +39,18 @@ const settings = definePluginSettings({
     ],
     default: "es",
   },
+  interfaceLanguage: {
+    type: OptionType.SELECT,
+    description: "Interface language for the plugin (UI labels, buttons, etc.)",
+    options: [
+      { label: "Español", value: "es" },
+      { label: "English", value: "en" },
+      { label: "Português", value: "pt" },
+      { label: "Français", value: "fr" },
+      { label: "Deutsch", value: "de" },
+    ],
+    default: "es",
+  },
   primaryTranslationService: {
     type: OptionType.SELECT,
     description: "Primary translation service",
@@ -52,13 +64,13 @@ const settings = definePluginSettings({
     type: OptionType.SELECT,
     description: "Gemini model to use",
     options: [
-      { label: "Gemini 2.5 Flash (Fast)", value: "gemini-2.5-flash" },
-      { label: "Gemini 2.5 Pro (Advanced)", value: "gemini-2.5-pro" },
-      { label: "Gemini 3 Flash Preview", value: "gemini-3-flash-preview" },
+      { label: "Gemini 3.1 Flash Lite (Fastest & Cheapest)", value: "gemini-3.1-flash-lite-preview" },
+      { label: "Gemini 3 Flash (Frontier)", value: "gemini-3-flash-preview" },
       { label: "Gemini 3.1 Pro Preview", value: "gemini-3.1-pro-preview" },
-      { label: "Gemini 2.5 Flash Lite", value: "gemini-2.5-flash-lite" },
+      { label: "Gemini 2.5 Flash (Stable)", value: "gemini-2.5-flash" },
+      { label: "Gemini 2.5 Pro (Advanced)", value: "gemini-2.5-pro" },
     ],
-    default: "gemini-2.5-flash",
+    default: "gemini-3.1-flash-lite-preview",
   },
   enableSynonyms: {
     type: OptionType.BOOLEAN,

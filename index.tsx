@@ -47,7 +47,7 @@ function makeWordsClickable(htmlText: string, onWordClick: (word: string) => voi
     });
 }
 
-// Translation using native helper
+// Translation using native helper - returns structured JSON
 async function translateWithGemini(text: string, apiKey: string): Promise<string> {
     if (!apiKey) return "";
     
@@ -71,9 +71,10 @@ async function translateWithGemini(text: string, apiKey: string): Promise<string
             "de": "Deutsch"
         }[nativeLang] || "Español";
         
+        const model = settings.store.geminiModel || "gemini-3.1-flash-lite-preview";
         const { status, data } = await Native.makeGeminiRequest(
             apiKey,
-            "gemini-2.5-flash",
+            model,
             `Eres Polyglot, un asistente de aprendizaje de idiomas diseñado específicamente para hispanohablantes que aprenden inglés.
 
 CONTEXTO DE APRENDIZAJE:
@@ -81,60 +82,47 @@ CONTEXTO DE APRENDIZAJE:
 - Idioma que estás aprendiendo: ${learningLangName} (${learningLang})
 - Traduce DE ${learningLangName} A ${nativeLangName}
 
-REGLAS ESTRICTAS DE RESPUESTA:
-1. RESPONDE ÚNICAMENTE con HTML inline válido (sin etiquetas <html>, <head>, <body>)
-2. Usa SOLO estas etiquetas HTML con CLASES CSS: 
-   - <p class="polyglot-translation"> para la traducción principal
-   - <p class="polyglot-grammar"> para información gramatical
-   - <p class="polyglot-vocab"> para pares de vocabulario
-   - <p class="polyglot-context"> para contexto
-   - <p class="polyglot-usage"> para forma de uso
-   - <p class="polyglot-examples-title"> para título de ejemplos
-   - <li class="polyglot-example"> para ejemplos individuales
-   - <p class="polyglot-explanation"> para explicaciones de ejemplos
-   - <p class="polyglot-alternatives-title"> para título de alternativas
-   - <li class="polyglot-alternative"> para alternativas individuales
-   - <strong class="polyglot-highlight"> para texto importante
-3. NO uses CSS inline, estilo, IDs, ni atributos adicionales
-4. Todas las explicaciones DEBEN estar en ${nativeLangName} (${nativeLang})
-5. Sé educado y objetivo al explicar cualquier término
+INSTRUCCIONES:
+1. Responde ÚNICAMENTE con un objeto JSON válido
+2. Todas las explicaciones DEBEN estar en ${nativeLangName} (${nativeLang})
+3. Sé educado y objetivo al explicar cualquier término
 
-ESTRUCTURA OBLIGATORIA DE RESPUESTA:
-<p class="polyglot-translation"><strong>[TRADUCCIÓN AL ${nativeLangName.toUpperCase()}]</strong></p>
-
-<p class="polyglot-vocab"><em>📚 Vocabulario clave (${learningLangName} → ${nativeLangName}):</em></p>
-<ul>
-<li class="polyglot-vocab-item">"<strong>[palabra/frase en ${learningLangName}]</strong>" = "<strong>[traducción en ${nativeLangName}]</strong>" [explicación breve en ${nativeLangName}]</li>
-</ul>
-
-<p class="polyglot-grammar"><em>📐 Gramática:</em></p>
-<ul>
-<li class="polyglot-grammar-point">[Explicación de la estructura gramatical en ${learningLangName}]</li>
-<li class="polyglot-grammar-point">[Equivalente en ${nativeLangName} y cómo difiere]</li>
-</ul>
-
-<p class="polyglot-context"><em>💡 Contexto:</em> [explicación breve del contexto o situación, si aplica]</p>
-
-<p class="polyglot-usage"><em>💬 Forma de uso:</em> [descripción de cuándo y cómo se usa esta expresión en ${learningLangName}]</p>
-
-<p class="polyglot-examples-title"><em>📝 Ejemplos prácticos:</em></p>
-<ul>
-<li class="polyglot-example"><strong>[Ejemplo 1 en ${learningLangName}]</strong> → <em>[traducción al ${nativeLangName}]</em></li>
-<li class="polyglot-example"><strong>[Ejemplo 2 en ${learningLangName}]</strong> → <em>[traducción al ${nativeLangName}]</em></li>
-</ul>
-
-<p class="polyglot-alternatives-title"><em>🔄 Otras formas de decirlo en ${learningLangName}:</em></p>
-<ul>
-<li class="polyglot-alternative">[alternativa 1 en ${learningLangName}] → [traducción]</li>
-<li class="polyglot-alternative">[alternativa 2 en ${learningLangName}] → [traducción]</li>
-</ul>
+ESTRUCTURA JSON OBLIGATORIA:
+{
+  "translation": "traducción principal al ${nativeLangName}",
+  "vocabulary": [
+    {
+      "word": "palabra en ${learningLangName}",
+      "translation": "traducción en ${nativeLangName}",
+      "explanation": "explicación breve en ${nativeLangName}"
+    }
+  ],
+  "grammar": [
+    "explicación de la estructura gramatical en ${learningLangName}",
+    "equivalente en ${nativeLangName} y cómo difiere"
+  ],
+  "context": "explicación breve del contexto o situación, si aplica",
+  "usage": "descripción de cuándo y cómo se usa esta expresión en ${learningLangName}",
+  "examples": [
+    {
+      "en": "ejemplo en ${learningLangName}",
+      "es": "traducción al ${nativeLangName}"
+    }
+  ],
+  "alternatives": [
+    {
+      "en": "alternativa en ${learningLangName}",
+      "es": "traducción"
+    }
+  ]
+}
 
 INSTRUCCIONES ESPECIALES:
 - Si el texto contiene palabras potencialmente ofensivas, explica su significado de manera objetiva y educada en ${nativeLangName}
 - No juzgues, solo informa el significado y uso común
-- Si no hay contexto especial, omite las secciones que no apliquen
+- Si no hay contexto especial, omite los campos que no apliquen (deja arrays vacíos o strings vacías)
 - Sé conciso pero informativo
-- Máximo 500 caracteres en tu respuesta
+- Responde SOLO con JSON, sin markdown ni explicaciones adicionales
 
 Texto de la conversación para contexto (últimos 5 mensajes):
 ${contextMessages}
@@ -144,38 +132,55 @@ Texto a traducir: "${text}"`
         
         if (status !== 200) {
             console.error("[Polyglot] Gemini API error status:", status);
-            return "";
+            return JSON.stringify({
+                error: true,
+                message: "Error de conexión con Gemini API"
+            });
         }
         
         const parsed = JSON.parse(data);
-        let result = parsed.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+        const result = parsed.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
         
-        // Validate and clean the HTML response
+        // Validate and clean the JSON response
         if (!result || result.trim() === "") {
             console.error("[Polyglot] Empty response from Gemini");
-            return '<p><strong>[Error de traducción]</strong></p><p>No se pudo obtener traducción.</p>';
+            return JSON.stringify({
+                error: true,
+                message: "No se pudo obtener traducción"
+            });
         }
         
-        // Clean the HTML response (remove any unwanted tags that might break the modal)
-        result = result
-            .replace(/<\/?html[^>]*>/gi, "")
-            .replace(/<\/?head[^>]*>/gi, "")
-            .replace(/<\/?body[^>]*>/gi, "")
-            .replace(/<\/?meta[^>]*>/gi, "")
-            .replace(/<\/?link[^>]*>/gi, "")
-            .replace(/<\/?style[^>]*>/gi, "")
-            .replace(/<\/?script[^>]*>[\s\S]*?<\/?script>/gi, "")
-            .trim();
+        // Try to parse as JSON, if fails return as plain text wrapped in JSON
+        try {
+            // Clean the response - remove markdown code blocks if present
+            let cleanResult = result.trim();
+            if (cleanResult.startsWith('```json')) {
+                cleanResult = cleanResult.replace(/```json\n?/, '').replace(/```\n?$/, '');
+            } else if (cleanResult.startsWith('```')) {
+                cleanResult = cleanResult.replace(/```\n?/, '').replace(/```\n?$/, '');
+            }
             
-        // Ensure we have some content
-        if (!result || result.trim() === "") {
-            return '<p><strong>[Traducción no disponible]</strong></p><p>El servicio de traducción no respondió correctamente.</p>';
+            const jsonResult = JSON.parse(cleanResult);
+            return JSON.stringify(jsonResult);
+        } catch (e) {
+            // If not valid JSON, return as plain text wrapped in JSON
+            console.warn("[Polyglot] Response is not valid JSON, returning as plain text");
+            return JSON.stringify({
+                translation: result,
+                vocabulary: [],
+                grammar: [],
+                context: "",
+                usage: "",
+                examples: [],
+                alternatives: []
+            });
         }
-        
-        return result;
     } catch (e) {
         console.error("[Polyglot] Gemini error:", e);
-        return '<p><strong>[Error de conexión]</strong></p><p>No se pudo conectar al servicio de traducción.</p>';
+        return JSON.stringify({
+            error: true,
+            message: "No se pudo conectar al servicio de traducción"
+        });
     }
 }
 
@@ -233,9 +238,10 @@ async function fetchSynonyms(word: string): Promise<string[]> {
 // Get synonyms from Gemini API
 async function fetchSynonymsFromGemini(word: string, apiKey: string): Promise<string[]> {
     try {
+        const model = settings.store.geminiModel || "gemini-3.1-flash-lite-preview";
         const { status, data } = await Native.makeGeminiRequest(
             apiKey,
-            "gemini-2.5-flash",
+            model,
             `La palabra en inglés es "${word}". Dame 10 sinónimos en español para esta palabra. Incluye sinónimos formales, informales, jerga coloquial y alternativas comunes. Responde SOLO con una lista separada por comas de sinónimos en español, sin explicaciones, sin numeración, sin texto extra. Ejemplo: feliz, contento, alegre, satisfecho`
         );
         
@@ -548,9 +554,10 @@ function showPolyglotPopup(text: string) {
         let exampleEN = "";
         let exampleES = "";
         try {
+            const model = settings.store.geminiModel || "gemini-3.1-flash-lite-preview";
             const { status, data } = await Native.makeGeminiRequest(
                 settings.store.geminiApiKey,
-                "gemini-2.5-flash",
+                model,
                 `Genera un ejemplo de uso de la palabra inglesa "${word}" en una oración en inglés, y su traducción al español. Responde en formato JSON: {"en": "oración en inglés", "es": "traducción al español"}. Solo el JSON, sin explicaciones.`
             );
             
@@ -646,22 +653,96 @@ function showPolyglotPopup(text: string) {
             return;
         }
 
-        translationData = await translateWithGemini(cleanText, geminiKey);
+        const rawResponse = await translateWithGemini(cleanText, geminiKey);
         
-        if (!translationData) {
+        if (!rawResponse) {
             translationData = '<span style="color:#72767d;">Translation failed. Check your API key.</span>';
+            if (translationDiv) translationDiv.innerHTML = translationData;
+            return;
         }
         
-        // Extract translation word from HTML (simplified)
-        wordTranslationData = translationData.replace(/<[^>]*>/g, "").substring(0, 30) || "Mejorar";
-        
-        // Update header with translation
-        const header = document.querySelector("#polyglot-popup h3");
-        if (header) {
-            header.textContent = `${cleanText.substring(0, 20)}${cleanText.length > 20 ? '...' : ''} (EN) -> ${wordTranslationData} (ES)`;
+        // Parse JSON response
+        try {
+            const responseData = JSON.parse(rawResponse);
+            
+            if (responseData.error) {
+                translationData = `<span style="color:#72767d;">${responseData.message || "Translation error"}</span>`;
+                if (translationDiv) translationDiv.innerHTML = translationData;
+                return;
+            }
+            
+            // Build HTML from JSON data
+            let html = '';
+            
+            // Main translation
+            if (responseData.translation) {
+                html += `<div class="polyglot-translation"><strong>${responseData.translation}</strong></div>`;
+                
+                // Extract first word for header
+                const firstWord = responseData.translation.split(' ')[0] || "Mejorar";
+                wordTranslationData = firstWord;
+                
+                // Update header with translation
+                const header = document.querySelector("#polyglot-popup h3");
+                if (header) {
+                    header.textContent = `${cleanText.substring(0, 20)}${cleanText.length > 20 ? '...' : ''} (EN) -> ${firstWord} (ES)`;
+                }
+            }
+            
+            // Vocabulary section
+            if (responseData.vocabulary && responseData.vocabulary.length > 0) {
+                html += '<div class="polyglot-vocab"><em>Vocabulario clave:</em></div><ul>';
+                for (const item of responseData.vocabulary) {
+                    html += `<li class="polyglot-vocab-item">"<strong>${item.word}</strong>" = "<strong>${item.translation}</strong>" [${item.explanation}]</li>`;
+                }
+                html += '</ul>';
+            }
+            
+            // Grammar section
+            if (responseData.grammar && responseData.grammar.length > 0) {
+                html += '<div class="polyglot-grammar"><em>Gramática:</em></div><ul>';
+                for (const point of responseData.grammar) {
+                    html += `<li class="polyglot-grammar-point">${point}</li>`;
+                }
+                html += '</ul>';
+            }
+            
+            // Context
+            if (responseData.context) {
+                html += `<div class="polyglot-context"><em>Contexto:</em> ${responseData.context}</div>`;
+            }
+            
+            // Usage
+            if (responseData.usage) {
+                html += `<div class="polyglot-usage"><em>Forma de uso:</em> ${responseData.usage}</div>`;
+            }
+            
+            // Examples
+            if (responseData.examples && responseData.examples.length > 0) {
+                html += '<div class="polyglot-examples-title"><em>Ejemplos prácticos:</em></div><ul>';
+                for (const example of responseData.examples) {
+                    html += `<li class="polyglot-example"><strong>${example.en}</strong> → <em>${example.es}</em></li>`;
+                }
+                html += '</ul>';
+            }
+            
+            // Alternatives
+            if (responseData.alternatives && responseData.alternatives.length > 0) {
+                html += '<div class="polyglot-alternatives-title"><em>Otras formas de decirlo:</em></div><ul>';
+                for (const alt of responseData.alternatives) {
+                    html += `<li class="polyglot-alternative">${alt.en} → ${alt.es}</li>`;
+                }
+                html += '</ul>';
+            }
+            
+            translationData = html || '<span style="color:#72767d;">No translation data available.</span>';
+            
+        } catch (e) {
+            console.error("[Polyglot] Failed to parse JSON response:", e);
+            translationData = '<span style="color:#72767d;">Error parsing translation response.</span>';
         }
         
-        // Display translation with properly rendered HTML (markdown converted)
+        // Display translation
         if (translationDiv) {
             translationDiv.innerHTML = translationData;
         }

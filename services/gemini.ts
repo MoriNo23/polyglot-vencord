@@ -32,12 +32,12 @@ export const isGeminiClientReady = (): boolean => {
 /**
  * Generate content using Gemini API
  * @param prompt The prompt to send to Gemini
- * @param model The model to use (default: gemini-2.5-flash)
+ * @param model The model to use (default: gemini-3.1-flash-lite-preview)
  * @returns The generated text or empty string on error
  */
 const generateContent = async (
   prompt: string,
-  model: string = "gemini-2.5-flash"
+  model: string = "gemini-3.1-flash-lite-preview"
 ): Promise<string> => {
   if (!geminiClient) {
     console.error("Gemini client not initialized. Call initGeminiClient first.");
@@ -61,13 +61,13 @@ const generateContent = async (
  * Translate text using Gemini API
  * @param text The text to translate
  * @param targetLang The target language code (e.g., 'es', 'fr')
- * @param model The model to use (default: gemini-2.5-flash)
+ * @param model The model to use (default: gemini-3.1-flash-lite-preview)
  * @returns The translated text
  */
 export const translateWithGemini = async (
   text: string,
   targetLang: string,
-  model: string = "gemini-2.5-flash"
+  model: string = "gemini-3.1-flash-lite-preview"
 ): Promise<string> => {
   const prompt = `Translate the following text to ${targetLang}: "${text}"`;
   return await generateContent(prompt, model);
@@ -76,12 +76,12 @@ export const translateWithGemini = async (
 /**
  * Get synonyms for a word using Gemini API (contextual)
  * @param word The word to get synonyms for
- * @param model The model to use (default: gemini-2.5-flash)
+ * @param model The model to use (default: gemini-3.1-flash-lite-preview)
  * @returns Array of synonym words
  */
 export const getSynonymsWithGemini = async (
   word: string,
-  model: string = "gemini-2.5-flash"
+  model: string = "gemini-3.1-flash-lite-preview"
 ): Promise<string[]> => {
   const prompt = `Give me a list of synonyms for the word: "${word}". Return only the synonyms separated by commas.`;
   const result = await generateContent(prompt, model);
@@ -96,12 +96,12 @@ export const getSynonymsWithGemini = async (
 /**
  * Get definition for a word using Gemini API (enhanced)
  * @param word The word to get definition for
- * @param model The model to use (default: gemini-2.5-flash)
+ * @param model The model to use (default: gemini-3.1-flash-lite-preview)
  * @returns The definition text
  */
 export const getDefinitionWithGemini = async (
   word: string,
-  model: string = "gemini-2.5-flash"
+  model: string = "gemini-3.1-flash-lite-preview"
 ): Promise<string> => {
   const prompt = `Give me a clear and concise definition of the word: "${word}".`;
   return await generateContent(prompt, model);
@@ -113,11 +113,11 @@ export const getDefinitionWithGemini = async (
  */
 export const getAvailableModels = (): string[] => {
   return [
-    "gemini-2.5-flash",
-    "gemini-2.5-pro",
+    "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
     "gemini-3.1-pro-preview",
-    "gemini-3.1-flash-lite-preview",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
     "gemini-2.5-flash-lite",
   ];
 };
