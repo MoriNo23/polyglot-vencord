@@ -11,6 +11,111 @@ import { settings } from "./settings";
 
 const Native = VencordNative.pluginHelpers.Polyglot as PluginNative<typeof import("./native")>;
 
+// UI translations for different interface languages
+const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
+    es: {
+        definition: "Definición:",
+        synonyms: "Sinónimos en español:",
+        example: "Ejemplo visual / Contexto:",
+        translation: "Translation",
+        context: "Contexto:",
+        examples: "Ejemplos prácticos:",
+        alternatives: "Otras formas de decirlo:",
+        vocabulary: "Vocabulario clave:",
+        grammar: "Gramática:",
+        usage: "Forma de uso:",
+        loading: "Loading...",
+        noData: "No translation data available.",
+        error: "Translation error",
+        clickWords: "Click words in header for synonyms • Powered by Gemini",
+        poweredBy: "Powered by Gemini • Polyglot",
+        back: "← Back",
+        close: "×"
+    },
+    en: {
+        definition: "Definition:",
+        synonyms: "Synonyms in English:",
+        example: "Example / Context:",
+        translation: "Translation",
+        context: "Context:",
+        examples: "Practical examples:",
+        alternatives: "Other ways to say it:",
+        vocabulary: "Key vocabulary:",
+        grammar: "Grammar:",
+        usage: "Usage:",
+        loading: "Loading...",
+        noData: "No translation data available.",
+        error: "Translation error",
+        clickWords: "Click words in header for synonyms • Powered by Gemini",
+        poweredBy: "Powered by Gemini • Polyglot",
+        back: "← Back",
+        close: "×"
+    },
+    pt: {
+        definition: "Definição:",
+        synonyms: "Sinônimos em português:",
+        example: "Exemplo / Contexto:",
+        translation: "Tradução",
+        context: "Contexto:",
+        examples: "Exemplos práticos:",
+        alternatives: "Outras formas de dizer:",
+        vocabulary: "Vocabulário principal:",
+        grammar: "Gramática:",
+        usage: "Uso:",
+        loading: "Carregando...",
+        noData: "Dados de tradução não disponíveis.",
+        error: "Erro de tradução",
+        clickWords: "Clique nas palavras no cabeçalho para sinônimos • Powered by Gemini",
+        poweredBy: "Powered by Gemini • Polyglot",
+        back: "← Voltar",
+        close: "×"
+    },
+    fr: {
+        definition: "Définition:",
+        synonyms: "Synonymes en français:",
+        example: "Exemple / Contexte:",
+        translation: "Traduction",
+        context: "Contexte:",
+        examples: "Exemples pratiques:",
+        alternatives: "Autres façons de le dire:",
+        vocabulary: "Vocabulaire clé:",
+        grammar: "Grammaire:",
+        usage: "Utilisation:",
+        loading: "Chargement...",
+        noData: "Données de traduction non disponibles.",
+        error: "Erreur de traduction",
+        clickWords: "Cliquez sur les mots dans l'en-tête pour les synonymes • Powered by Gemini",
+        poweredBy: "Powered by Gemini • Polyglot",
+        back: "← Retour",
+        close: "×"
+    },
+    de: {
+        definition: "Definition:",
+        synonyms: "Synonyme auf Deutsch:",
+        example: "Beispiel / Kontext:",
+        translation: "Übersetzung",
+        context: "Kontext:",
+        examples: "Praktische Beispiele:",
+        alternatives: "Andere Möglichkeiten, es auszudrücken:",
+        vocabulary: "Schlüsselvokabular:",
+        grammar: "Grammatik:",
+        usage: "Verwendung:",
+        loading: "Laden...",
+        noData: "Keine Übersetzungsdaten verfügbar.",
+        error: "Übersetzungsfehler",
+        clickWords: "Klicken Sie auf Wörter im Header für Synonyme • Powered by Gemini",
+        poweredBy: "Powered by Gemini • Polyglot",
+        back: "← Zurück",
+        close: "×"
+    }
+};
+
+// Get UI translation based on interface language setting
+function getUIText(key: string): string {
+    const lang = settings.store.interfaceLanguage || "es";
+    return UI_TRANSLATIONS[lang]?.[key] || UI_TRANSLATIONS.es[key] || key;
+}
+
 // Convert markdown to HTML - handles various markdown formats
 function markdownToHtml(text: string): string {
     // First convert markdown bold: **text** or __text__
@@ -75,59 +180,59 @@ async function translateWithGemini(text: string, apiKey: string): Promise<string
         const { status, data } = await Native.makeGeminiRequest(
             apiKey,
             model,
-            `Eres Polyglot, un asistente de aprendizaje de idiomas diseñado específicamente para hispanohablantes que aprenden inglés.
+            `You are Polyglot, a language learning assistant.
 
-CONTEXTO DE APRENDIZAJE:
-- Tu idioma nativo: ${nativeLangName} (${nativeLang})
-- Idioma que estás aprendiendo: ${learningLangName} (${learningLang})
-- Traduce DE ${learningLangName} A ${nativeLangName}
+LEARNING CONTEXT:
+- Native language: ${nativeLangName} (${nativeLang})
+- Learning language: ${learningLangName} (${learningLang})
+- Translate FROM ${learningLangName} TO ${nativeLangName}
 
-INSTRUCCIONES:
-1. Responde ÚNICAMENTE con un objeto JSON válido
-2. Todas las explicaciones DEBEN estar en ${nativeLangName} (${nativeLang})
-3. Sé educado y objetivo al explicar cualquier término
+INSTRUCTIONS:
+1. Respond ONLY with a valid JSON object
+2. All explanations MUST be in ${nativeLangName} (${nativeLang})
+3. Be educational and objective when explaining any term
 
-ESTRUCTURA JSON OBLIGATORIA:
+REQUIRED JSON STRUCTURE:
 {
-  "translation": "traducción principal al ${nativeLangName}",
+  "translation": "main translation in ${nativeLangName}",
   "vocabulary": [
     {
-      "word": "palabra en ${learningLangName}",
-      "translation": "traducción en ${nativeLangName}",
-      "explanation": "explicación breve en ${nativeLangName}"
+      "word": "word in ${learningLangName}",
+      "translation": "translation in ${nativeLangName}",
+      "explanation": "brief explanation in ${nativeLangName}"
     }
   ],
   "grammar": [
-    "explicación de la estructura gramatical en ${learningLangName}",
-    "equivalente en ${nativeLangName} y cómo difiere"
+    "explanation of grammatical structure in ${learningLangName}",
+    "equivalent in ${nativeLangName} and how it differs"
   ],
-  "context": "explicación breve del contexto o situación, si aplica",
-  "usage": "descripción de cuándo y cómo se usa esta expresión en ${learningLangName}",
+  "context": "brief explanation of context or situation, if applicable",
+  "usage": "description of when and how this expression is used in ${learningLangName}",
   "examples": [
     {
-      "en": "ejemplo en ${learningLangName}",
-      "es": "traducción al ${nativeLangName}"
+      "en": "example in ${learningLangName}",
+      "es": "translation in ${nativeLangName}"
     }
   ],
   "alternatives": [
     {
-      "en": "alternativa en ${learningLangName}",
-      "es": "traducción"
+      "en": "alternative in ${learningLangName}",
+      "es": "translation"
     }
   ]
 }
 
-INSTRUCCIONES ESPECIALES:
-- Si el texto contiene palabras potencialmente ofensivas, explica su significado de manera objetiva y educada en ${nativeLangName}
-- No juzgues, solo informa el significado y uso común
-- Si no hay contexto especial, omite los campos que no apliquen (deja arrays vacíos o strings vacías)
-- Sé conciso pero informativo
-- Responde SOLO con JSON, sin markdown ni explicaciones adicionales
+SPECIAL INSTRUCTIONS:
+- If the text contains potentially offensive words, explain their meaning objectively and educationally in ${nativeLangName}
+- Do not judge, just inform about common meaning and usage
+- If there is no special context, omit fields that don't apply (leave empty arrays or empty strings)
+- Be concise but informative
+- Respond ONLY with JSON, no markdown or additional explanations
 
-Texto de la conversación para contexto (últimos 5 mensajes):
+Conversation context (last 5 messages):
 ${contextMessages}
 
-Texto a traducir: "${text}"`
+Text to translate: "${text}"`
         );
         
         if (status !== 200) {
@@ -239,10 +344,32 @@ async function fetchSynonyms(word: string): Promise<string[]> {
 async function fetchSynonymsFromGemini(word: string, apiKey: string): Promise<string[]> {
     try {
         const model = settings.store.geminiModel || "gemini-3.1-flash-lite-preview";
+        const learningLang = settings.store.learningLanguage || "en";
+        const nativeLang = settings.store.nativeLanguage || "es";
+        const learningLangName = {
+            "en": "English",
+            "es": "Español",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[learningLang] || "English";
+        const nativeLangName = {
+            "es": "Español",
+            "en": "English",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[nativeLang] || "Español";
+        
         const { status, data } = await Native.makeGeminiRequest(
             apiKey,
             model,
-            `La palabra en inglés es "${word}". Dame 10 sinónimos en español para esta palabra. Incluye sinónimos formales, informales, jerga coloquial y alternativas comunes. Responde SOLO con una lista separada por comas de sinónimos en español, sin explicaciones, sin numeración, sin texto extra. Ejemplo: feliz, contento, alegre, satisfecho`
+            `You are helping someone learn ${learningLangName}.
+Give 10 synonyms for the word "${word}" in ${nativeLangName}.
+Include formal, informal, slang, and colloquial synonyms.
+Respond ONLY with a comma-separated list of synonyms in ${nativeLangName},
+no explanations, no numbering, no extra text.
+Example: happy, joyful, pleased, content, glad`
         );
         
         if (status !== 200) {
@@ -413,15 +540,15 @@ function showPolyglotPopup(text: string) {
                 
                 <div style="padding: 16px; min-height: 150px; max-height: 350px; overflow-y: auto;">
                     <div style="margin-bottom: 8px; color: #5865f2; font-size: 13px; font-weight: 600;">
-                        Translation (${settings.store.learningLanguage || "en"} → ${settings.store.nativeLanguage || "es"})
+                        ${getUIText('translation')} (${settings.store.learningLanguage || "en"} → ${settings.store.nativeLanguage || "es"})
                     </div>
                     <div id="polyglot-translation" style="color: #dcddde; line-height: 1.8; font-size: 14px;">
-                        ${translationData || '<span style="color:#72767d;">Loading...</span>'}
+                        ${translationData || `<span style="color:#72767d;">${getUIText('loading')}</span>`}
                     </div>
                 </div>
             
             <div style="padding: 12px 16px; font-size: 11px; color: #72767d; border-top: 1px solid #202225;">
-                Click words in header for synonyms • Powered by Datamuse & Gemini
+                ${getUIText('clickWords')}
             </div>
         `;
             
@@ -525,11 +652,11 @@ function showPolyglotPopup(text: string) {
                 </div>
                 
                 <div id="polyglot-synonyms-content" style="padding: 16px; min-height: 300px; max-height: 400px; overflow-y: auto;">
-                    <div style="text-align: center; color: #72767d; padding: 20px;">Loading...</div>
+                    <div style="text-align: center; color: #72767d; padding: 20px;">${getUIText('loading')}</div>
                 </div>
                 
                 <div style="padding: 12px 16px; font-size: 11px; color: #72767d; border-top: 1px solid #202225;">
-                    Powered by Gemini • Polyglot
+                    ${getUIText('poweredBy')}
                 </div>
             `;
             
@@ -551,14 +678,34 @@ function showPolyglotPopup(text: string) {
         const translation = await translateWithGemini(word, settings.store.geminiApiKey);
         
         // Generate example using Gemini
-        let exampleEN = "";
-        let exampleES = "";
+        const learningLang = settings.store.learningLanguage || "en";
+        const nativeLang = settings.store.nativeLanguage || "es";
+        const learningLangName = {
+            "en": "English",
+            "es": "Español",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[learningLang] || "English";
+        const nativeLangName = {
+            "es": "Español",
+            "en": "English",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[nativeLang] || "Español";
+        
+        let exampleLearning = "";
+        let exampleNative = "";
         try {
             const model = settings.store.geminiModel || "gemini-3.1-flash-lite-preview";
             const { status, data } = await Native.makeGeminiRequest(
                 settings.store.geminiApiKey,
                 model,
-                `Genera un ejemplo de uso de la palabra inglesa "${word}" en una oración en inglés, y su traducción al español. Responde en formato JSON: {"en": "oración en inglés", "es": "traducción al español"}. Solo el JSON, sin explicaciones.`
+                `Generate an example sentence using the ${learningLangName} word "${word}" 
+and its translation to ${nativeLangName}.
+Respond in JSON format: {"learning": "sentence in ${learningLangName}", "native": "translation in ${nativeLangName}"}
+Only the JSON, no explanations.`
             );
             
             if (status === 200) {
@@ -568,17 +715,17 @@ function showPolyglotPopup(text: string) {
                     // Clean the text and try to parse JSON
                     const cleanedText = text.replace(/```json|```/g, "").trim();
                     const exampleData = JSON.parse(cleanedText);
-                    exampleEN = exampleData.en || "";
-                    exampleES = exampleData.es || "";
+                    exampleLearning = exampleData.learning || exampleData.en || "";
+                    exampleNative = exampleData.native || exampleData.es || "";
                 } catch (e) {
                     // Fallback if JSON parsing fails
-                    exampleEN = `The new patch will enhance the system performance.`;
-                    exampleES = `El nuevo parche mejorará el rendimiento del sistema.`;
+                    exampleLearning = `The new patch will enhance the system performance.`;
+                    exampleNative = `El nuevo parche mejorará el rendimiento del sistema.`;
                 }
             }
         } catch (e) {
-            exampleEN = `The new patch will enhance the system performance.`;
-            exampleES = `El nuevo parche mejorará el rendimiento del sistema.`;
+            exampleLearning = `The new patch will enhance the system performance.`;
+            exampleNative = `El nuevo parche mejorará el rendimiento del sistema.`;
         }
         
         // Update wordTranslationData
@@ -587,10 +734,10 @@ function showPolyglotPopup(text: string) {
         let html = `
             <div style="margin-bottom: 20px;">
                 <div style="color: #5865f2; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-                    Definición:
+                    ${getUIText('definition')}
                 </div>
                 <div style="color: #dcddde; line-height: 1.6; background: #2f3136; padding: 12px; border-radius: 6px; font-size: 14px;">
-                    ${definition || 'Aumentar o mejorar aún más la calidad, el valor o la eficiencia de un proceso o sistema.'}
+                    ${definition || 'Increase or further improve the quality, value or efficiency of a process or system.'}
                 </div>
             </div>
         `;
@@ -600,7 +747,7 @@ function showPolyglotPopup(text: string) {
             html += `
                 <div style="margin-bottom: 20px;">
                     <div style="color: #5865f2; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-                        Sinónimos en español:
+                        ${getUIText('synonyms')}
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;">
                         ${synonyms.slice(0, 4).map(s => `
@@ -619,11 +766,11 @@ function showPolyglotPopup(text: string) {
         html += `
             <div style="margin-bottom: 20px;">
                 <div style="color: #5865f2; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-                    Ejemplo visual / Contexto:
+                    ${getUIText('example')}
                 </div>
                 <div style="color: #dcddde; line-height: 1.6; background: #2f3136; padding: 12px; border-radius: 6px; font-size: 14px;">
-                    EN: "${exampleEN}"<br>
-                    ES: "${exampleES}"
+                    ${learningLangName}: "${exampleLearning}"<br>
+                    ${nativeLangName}: "${exampleNative}"
                 </div>
             </div>
         `;
@@ -646,6 +793,23 @@ function showPolyglotPopup(text: string) {
     async function loadTranslation() {
         const geminiKey = settings.store.geminiApiKey;
         const translationDiv = document.getElementById("polyglot-translation");
+        
+        const learningLang = settings.store.learningLanguage || "en";
+        const nativeLang = settings.store.nativeLanguage || "es";
+        const learningLangName = {
+            "en": "English",
+            "es": "Español",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[learningLang] || "English";
+        const nativeLangName = {
+            "es": "Español",
+            "en": "English",
+            "pt": "Português",
+            "fr": "Français",
+            "de": "Deutsch"
+        }[nativeLang] || "Español";
         
         if (!geminiKey) {
             translationData = '<span style="color:#72767d;">Set your Gemini API key in plugin settings for translation.</span>';
@@ -685,13 +849,13 @@ function showPolyglotPopup(text: string) {
                 // Update header with translation
                 const header = document.querySelector("#polyglot-popup h3");
                 if (header) {
-                    header.textContent = `${cleanText.substring(0, 20)}${cleanText.length > 20 ? '...' : ''} (EN) -> ${firstWord} (ES)`;
+                    header.textContent = `${cleanText.substring(0, 20)}${cleanText.length > 20 ? '...' : ''} (${learningLang.toUpperCase()}) -> ${firstWord} (${nativeLang.toUpperCase()})`;
                 }
             }
             
             // Vocabulary section
             if (responseData.vocabulary && responseData.vocabulary.length > 0) {
-                html += '<div class="polyglot-vocab"><em>Vocabulario clave:</em></div><ul>';
+                html += `<div class="polyglot-vocab"><em>${getUIText('vocabulary')}</em></div><ul>`;
                 for (const item of responseData.vocabulary) {
                     html += `<li class="polyglot-vocab-item">"<strong>${item.word}</strong>" = "<strong>${item.translation}</strong>" [${item.explanation}]</li>`;
                 }
@@ -700,7 +864,7 @@ function showPolyglotPopup(text: string) {
             
             // Grammar section
             if (responseData.grammar && responseData.grammar.length > 0) {
-                html += '<div class="polyglot-grammar"><em>Gramática:</em></div><ul>';
+                html += `<div class="polyglot-grammar"><em>${getUIText('grammar')}</em></div><ul>`;
                 for (const point of responseData.grammar) {
                     html += `<li class="polyglot-grammar-point">${point}</li>`;
                 }
@@ -709,17 +873,17 @@ function showPolyglotPopup(text: string) {
             
             // Context
             if (responseData.context) {
-                html += `<div class="polyglot-context"><em>Contexto:</em> ${responseData.context}</div>`;
+                html += `<div class="polyglot-context"><em>${getUIText('context')}</em> ${responseData.context}</div>`;
             }
             
             // Usage
             if (responseData.usage) {
-                html += `<div class="polyglot-usage"><em>Forma de uso:</em> ${responseData.usage}</div>`;
+                html += `<div class="polyglot-usage"><em>${getUIText('usage')}</em> ${responseData.usage}</div>`;
             }
             
             // Examples
             if (responseData.examples && responseData.examples.length > 0) {
-                html += '<div class="polyglot-examples-title"><em>Ejemplos prácticos:</em></div><ul>';
+                html += `<div class="polyglot-examples-title"><em>${getUIText('examples')}</em></div><ul>`;
                 for (const example of responseData.examples) {
                     html += `<li class="polyglot-example"><strong>${example.en}</strong> → <em>${example.es}</em></li>`;
                 }
@@ -728,14 +892,14 @@ function showPolyglotPopup(text: string) {
             
             // Alternatives
             if (responseData.alternatives && responseData.alternatives.length > 0) {
-                html += '<div class="polyglot-alternatives-title"><em>Otras formas de decirlo:</em></div><ul>';
+                html += `<div class="polyglot-alternatives-title"><em>${getUIText('alternatives')}</em></div><ul>`;
                 for (const alt of responseData.alternatives) {
                     html += `<li class="polyglot-alternative">${alt.en} → ${alt.es}</li>`;
                 }
                 html += '</ul>';
             }
             
-            translationData = html || '<span style="color:#72767d;">No translation data available.</span>';
+            translationData = html || `<span style="color:#72767d;">${getUIText('noData')}</span>`;
             
         } catch (e) {
             console.error("[Polyglot] Failed to parse JSON response:", e);
