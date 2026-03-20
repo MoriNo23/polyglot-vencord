@@ -2,6 +2,12 @@
 
 A Vencord plugin that provides educational language learning features directly in Discord. Get translations, synonyms, and definitions when selecting text.
 
+## Screenshots
+
+![Translation Example](screenshot-translation.png)
+![Definition View](screenshot-definition.png)
+![Action in Use](screenshot-action.png)
+
 ## Features
 
 - **Translation**: Translate text from your learning language to your native language using Gemini API
@@ -159,6 +165,30 @@ pnpm build
 4. Test thoroughly
 5. Submit a pull request
 
+## Help Wanted
+
+We're looking for contributors to help improve this project! Here are some areas where we need help:
+
+### Ideas & Suggestions
+- **Feature ideas**: What other language learning features would be useful?
+- **UI/UX improvements**: How can we make the interface more intuitive?
+- **Language support**: Help add support for more languages
+- **API integrations**: Suggestions for better translation/synonym APIs
+
+### Code Contributions
+- **Bug fixes**: Help fix reported issues
+- **Performance improvements**: Optimize API calls and caching
+- **Testing**: Help test on different platforms and Discord versions
+- **Documentation**: Improve README, add examples, translate docs
+
+### How to Help
+1. **Open an issue** with your idea or suggestion
+2. **Comment on existing issues** if you have thoughts
+3. **Submit a pull request** with your improvements
+4. **Share feedback** on what works and what doesn't
+
+We appreciate all contributions, whether it's code, ideas, bug reports, or just feedback!
+
 ## License
 
 This project is for educational purposes. Use responsibly and respect API rate limits.
@@ -174,5 +204,4 @@ If you encounter issues:
 
 - [Vencord](https://github.com/Vencord/Vencord) - Discord client modification
 - [Gemini API](https://ai.google.dev/) - Google's AI model
-- [DeepL API](https://www.deepl.com/) - Translation service
-- [Datamuse API](https://www.datamuse.com/api/) - Word associations
+- [DeepL API](https://www.deepl.com/) - Translation service (optional)
