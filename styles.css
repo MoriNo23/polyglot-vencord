@@ -1,111 +1,90 @@
-/* Polyglot Plugin Styles */
-
-.polyglot-floating-button {
-  transition: all 0.2s ease;
+.polyglot-floating-btn:hover {
+    filter: brightness(1.15);
+    transform: scale(1.1) !important;
 }
 
-.polyglot-floating-button:hover {
-  background-color: #4752c4 !important;
-  transform: scale(1.05);
+#polyglot-popup-container {
+    position: fixed;
+    z-index: 2147483646;
+    top: 0;
+    left: 0;
 }
 
-.polyglot-popup-card {
-  animation: polyglot-fadeIn 0.2s ease;
-}
-
-@keyframes polyglot-fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Tab buttons */
-.polyglot-tab-button {
-  transition: background-color 0.2s ease;
-}
-
-.polyglot-tab-button:hover:not([disabled]) {
-  background-color: #5865f2 !important;
-}
-
-/* Synonym tags */
-.polyglot-synonym-tag {
-  transition: all 0.2s ease;
-}
-
-.polyglot-synonym-tag:hover {
-  background-color: #5865f2 !important;
-  transform: translateY(-2px);
-}
-
-/* Selection highlight */
-.polyglot-selected-text {
-  background-color: rgba(88, 101, 242, 0.3) !important;
-  border-radius: 2px;
-}
-
-/* Loading states */
-.polyglot-loading {
-  animation: polyglot-pulse 1.5s infinite;
-}
-
-@keyframes polyglot-pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Dark mode support for Discord */
-@media (prefers-color-scheme: dark) {
-  .polyglot-popup-card {
-    background-color: #36393f !important;
-    color: #dcddde !important;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 400px) {
-  .polyglot-popup-card {
-    left: 10px !important;
-    right: 10px !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-  }
-}
-
-/* Focus styles for accessibility */
-.polyglot-button:focus-visible {
-  outline: 2px solid #5865f2;
-  outline-offset: 2px;
-}
-
-/* Scrollbar styling */
+/* Discord-themed scrollbar styling */
 .polyglot-popup-card::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
 }
 
 .polyglot-popup-card::-webkit-scrollbar-track {
-  background: #2f3136;
-  border-radius: 4px;
+    background: #2f3136;
+    border-radius: 4px;
 }
 
 .polyglot-popup-card::-webkit-scrollbar-thumb {
-  background: #4f545c;
-  border-radius: 4px;
+    background: #4f545c;
+    border-radius: 4px;
 }
 
 .polyglot-popup-card::-webkit-scrollbar-thumb:hover {
-  background: #5865f2;
+    background: #72767d;
+}
+
+/* Firefox scrollbar styling */
+.polyglot-popup-card {
+    scrollbar-width: thin;
+    scrollbar-color: #4f545c #2f3136;
+}
+
+/* Section headers - clean uppercase */
+.polyglot-section-header {
+    color: #b9bbbe;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Grammar analysis - element on left, function on right */
+.polyglot-grammar-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #40444b;
+}
+
+.polyglot-grammar-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.polyglot-grammar-item:first-child {
+    padding-top: 0;
+}
+
+.polyglot-grammar-element {
+    color: #00b0f4;
+    font-weight: 600;
+    font-size: 14px;
+    background-color: rgba(0, 176, 244, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.polyglot-grammar-function {
+    color: #faa61a;
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.polyglot-grammar-arrow {
+    color: #72767d;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
