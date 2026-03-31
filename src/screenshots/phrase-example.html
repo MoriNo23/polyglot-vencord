@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polyglot - Phrase Example</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #36393f;
+    color: #dcddde;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .panel {
+    width: 420px;
+    height: 700px;
+    background: #36393f;
+    border-radius: 8px 0 0 8px;
+    padding: 16px;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.3);
+    border: 1px solid #202225;
+    overflow-y: auto;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .header h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px 8px;
+    line-height: 1;
+    border-radius: 4px;
+  }
+  .word-segment {
+    background-color: #2f3136;
+    border: 1px solid #40444b;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+    color: #ffffff;
+    font-weight: 500;
+  }
+  .word-segment span {
+    display: inline;
+    margin-right: 4px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.15s ease;
+  }
+  .word-segment span:hover {
+    background-color: #40444b;
+  }
+  .content-area {
+    background-color: #2f3136;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #40444b;
+  }
+  .label {
+    color: #72767d;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .entry {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: #ffffff;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  .entry-phonetics {
+    color: #72767d;
+    margin-left: 8px;
+    font-size: 13px;
+  }
+  .translation {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: #00b0f4;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .section-header {
+    color: #b9bbbe;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .note {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-left: 3px solid #faa61a;
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: #dcddde;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .grammar-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #40444b;
+  }
+  .grammar-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .grammar-item:first-child {
+    padding-top: 0;
+  }
+  .grammar-element {
+    color: #00b0f4;
+    font-weight: 600;
+    font-size: 14px;
+    background-color: rgba(0, 176, 244, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .grammar-function {
+    color: #faa61a;
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .grammar-arrow {
+    color: #72767d;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .grammar-card {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .alt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .alt-card {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  .alt-term {
+    color: #00b0f4;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .alt-desc {
+    color: #72767d;
+    font-size: 12px;
+    display: block;
+  }
+  .footer {
+    font-size: 11px;
+    color: #72767d;
+    border-top: 1px solid #40444b;
+    padding-top: 12px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .close-footer-btn {
+    padding: 6px 12px;
+    background-color: #4f545c;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  svg { vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="header">
+    <h3>Polyglot</h3>
+    <button class="close-btn" type="button">×</button>
+  </div>
+
+  <div class="word-segment">
+    <span>How</span> <span>are</span> <span>you</span> <span>doing</span> <span>today</span>
+  </div>
+
+  <div class="content-area">
+    <div class="label">Entrada / Entry</div>
+    <div class="entry">
+      <span>How are you doing today</span>
+    </div>
+
+    <div class="label">Traducción</div>
+    <div class="translation">¿Cómo estás hoy?</div>
+
+    <div class="section-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Book</title><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Nota pedagógica
+    </div>
+    <div class="note">
+      Esta es una expresión informal común en inglés para preguntar cómo está alguien. "How are you doing" es más casual que "How are you" y se usa frecuentemente en conversaciones cotidianas.
+    </div>
+
+    <div class="section-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Text</title><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      Grammatical Analysis
+    </div>
+    <div class="grammar-card">
+      <div class="grammar-item">
+        <span class="grammar-element">how</span>
+        <svg class="grammar-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Arrow</title><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span class="grammar-function">Adverbio interrogativo - pregunta por el estado o condición</span>
+      </div>
+      <div class="grammar-item">
+        <span class="grammar-element">are</span>
+        <svg class="grammar-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Arrow</title><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span class="grammar-function">Verbo 'to be' en segunda persona - estado actual</span>
+      </div>
+      <div class="grammar-item">
+        <span class="grammar-element">you</span>
+        <svg class="grammar-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Arrow</title><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span class="grammar-function">Pronombre personal - segunda persona singular/plural</span>
+      </div>
+      <div class="grammar-item">
+        <span class="grammar-element">doing</span>
+        <svg class="grammar-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Arrow</title><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span class="grammar-function">Verbo 'do' en gerundio - acción de estar haciendo</span>
+      </div>
+      <div class="grammar-item">
+        <span class="grammar-element">today</span>
+        <svg class="grammar-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Arrow</title><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span class="grammar-function">Adverbio de tiempo - en el día presente</span>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>Swap</title><path d="M16 3l4 4-4 4"/><path d="M20 7H4"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/></svg>
+      Alternativas
+    </div>
+    <div class="alt-grid">
+      <div class="alt-card">
+        <span class="alt-term">How's it going?</span>
+        <span class="alt-desc">Informal, muy común</span>
+      </div>
+      <div class="alt-card">
+        <span class="alt-term">How are things?</span>
+        <span class="alt-desc">Casual, general</span>
+      </div>
+      <div class="alt-card">
+        <span class="alt-term">What's up?</span>
+        <span class="alt-desc">Muy informal</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      Powered by Gemini
+      <button class="close-footer-btn" type="button">Close</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

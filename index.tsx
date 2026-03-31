@@ -146,6 +146,7 @@ export default definePlugin({
     name: "Polyglot",
     description: "Educational language learning tool - get translations, synonyms, and definitions by selecting text in Discord",
     authors: [{ name: "Polyglot", id: 0n }],
+    version: "2.0.0",
     settings,
 
     start() {
