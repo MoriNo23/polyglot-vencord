@@ -47,25 +47,10 @@ export const PopupCard = ({
           overflowY: "auto",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <div style={{ marginBottom: "16px" }}>
           <h3 style={{ margin: 0, color: "#ffffff" }}>
             Polyglot
           </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#b9bbbe",
-              cursor: "pointer",
-              fontSize: "18px",
-              padding: "4px 8px",
-              lineHeight: 1,
-            }}
-            type="button"
-          >
-            ×
-          </button>
         </div>
         
         <div style={{ 
@@ -103,6 +88,13 @@ export const PopupCard = ({
 
   const showTabs = isOriginalWord;
 
+  const tabs = isOriginalWord
+    ? [
+        { id: "synonyms", label: "Dictionary" },
+        { id: "translation", label: "Translation" },
+      ]
+    : [];
+
   return (
     <div
       className="polyglot-popup-card"
@@ -122,27 +114,10 @@ export const PopupCard = ({
         overflowY: "auto",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+      <div style={{ marginBottom: "16px" }}>
         <h3 style={{ margin: 0, color: "#ffffff", fontSize: "16px", fontWeight: 600 }}>
           Polyglot
         </h3>
-        <button
-          onClick={onClose}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "#b9bbbe",
-            cursor: "pointer",
-            fontSize: "20px",
-            padding: "4px 8px",
-            lineHeight: 1,
-            borderRadius: "4px",
-            transition: "background-color 0.15s ease, color 0.15s ease",
-          }}
-          type="button"
-        >
-          ×
-        </button>
       </div>
 
       <div style={{ marginBottom: "16px" }}>
